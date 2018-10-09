@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+    <!--读取数据库配置文件-->
+    <context:property-placeholder location="classpath:config/db.properties" />
+    <!--读取数据库参数-->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <!-- 配置连接池属性 -->
+        <property name="driverClassName" value="${driver}"></property>
+        <property name="url" value="${url}"></property>
+        <property name="username" value="${user}"></property>
+        <property name="password" value="${password}"></property>
+
+        <!-- c3p0连接池的私有属性 -->
+        <property name="maxActive" value="30"></property>
+
+        <!-- 关闭连接后不自动 -->
+
+        <!-- 获取连接超时时间 -->
+        <property name="maxWait" value="1000"></property>
+        <!-- 当获取连接失败重复次数 -->
+
+    </bean>
+    <!--扫描@component及以下的注解:@Service,@Resource-->
+    <context:component-scan base-package="com.code.resumemanagement" />
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入数据库连接池 -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 配置Mybatis全局配置文件：mybatis-config.xml -->
+        <!--    <property name="configLocation" value="classpath:config/mybatis-config.xml" />-->
+        <!-- 扫描entity包 使用别名 org.seckill.entity.Seckill->Seckill -->
+        <!-- <property name="typeAliasesPackage" value="com.hailong.domain" />
+         --><!-- 扫描sql配置文件：mapper需要的xml文件 -->
+
+        <property name="mapperLocations" value="classpath:mapper/*.xml" />
+    </bean>
+
+
+    <!-- 4: 配合扫描Dao接口包，动态实现Dao接口，注入到spring容器中 -->
+    <!--扫描dao接口路径-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 注入sqlSessionFactory -->
+        <!--<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+        --><!-- 扫描给出需要扫描Dao接口包 -->
+        <property name="basePackage" value="com.code.resumemanagement.dao"></property>
+    </bean>
+<!--    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <bean id="txManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="txManager"/>-->
+</beans>

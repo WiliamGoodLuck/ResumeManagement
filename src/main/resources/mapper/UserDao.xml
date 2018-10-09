@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.code.resumemanagement.dao.UserDao">
+    <insert id="insertUser" parameterType="com.code.resumemanagement.domain.User" >
+        INSERT INTO user (id,userName,passWord,nickName,gender,age,phoneNumber,email,createDate)
+VALUES(#{id},#{userName},#{passWord},#{nickName},#{gender},#{age},#{phoneNumber},#{email},#{createDate});
+
+    </insert>
+    <insert id="insertUserRole" parameterType="com.code.resumemanagement.domain.UserRole" >
+        INSERT INTO user_role (id,userId,roleId)
+        VALUES(#{id},#{userId},#{roleId});
+
+    </insert>
+
+    <select id="queryUserByName" resultType="com.code.resumemanagement.domain.User" parameterType="java.lang.String">
+              SELECT u.*,r.roleName as roleName ,r.roleKey as roleKey FROM role r,user_role ur,user u WHERE r.id = ur.roleId AND u.id = ur.userId AND u.userName=#{userName}
+
+    </select>
+    <select id="selectUserByUserName" resultType="com.code.resumemanagement.domain.User" parameterType="java.lang.String">
+        SELECT * FROM user  WHERE userName=#{userName}
+
+    </select>
+
+    <select id="queryRolesByName" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT role FROM role r,user_role ur,user u WHERE r.id = ur.roleId AND u.id = ur.userId AND u.userName=#{userName}
+    </select>
+
+    <select id="selectPermissionsByUserName" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT p.url FROM role r,user_role ur,user u ,role_permission rp , permission p WHERE r.id=rp.roleId AND rp.permissionId=p.id AND r.id = ur.roleId AND u.id = ur.userId AND u.userName=#{userName}
+    </select>
+    <update id="updateUserSys" parameterType="com.code.resumemanagement.domain.User">
+        UPDATE user
+        SET
+        nickName=#{nickName},
+        gender=#{gender},
+        age=#{age} ,
+        phoneNumber=#{phoneNumber},
+        email= #{email}
+        WHERE  id=#{id}
+    </update>
+    <update id="updateUserRole" parameterType="com.code.resumemanagement.domain.User">
+        UPDATE user_role
+        SET
+        roleId=#{roleId}
+
+        WHERE  userId=#{id}
+    </update>
+    <update id="updateUserInfo" parameterType="com.code.resumemanagement.domain.User">
+        UPDATE user
+        SET
+        nickName=#{nickName},
+        gender=#{gender},
+        age=#{age} ,
+        phoneNumber=#{phoneNumber},
+        email= #{email}
+        WHERE  id=#{id}
+    </update>
+    <update id="updateUserPassWord" parameterType="com.code.resumemanagement.domain.User">
+        UPDATE user
+        SET
+        passWord=#{passWord}
+
+        WHERE  id=#{id}
+    </update>
+
+
+    <select id="selectUserById" parameterType="string"
+            resultType="com.code.resumemanagement.domain.User">
+        SELECT u.*,r.roleName as roleName  FROM role r,user_role ur,user u WHERE r.id = ur.roleId AND u.id = ur.userId AND u.id=#{userId}
+
+    </select>
+    <select id="selectUserByParam" parameterType="map"
+            resultType="com.code.resumemanagement.domain.User">
+        SELECT u.*,r.roleName as roleName FROM role r,user_role ur,user u WHERE r.id = ur.roleId AND u.id = ur.userId
+        <if test="nickName != null ">
+            and u.nickName LIKE CONCAT('%',#{nickName},'%' )
+        </if>
+ORDER  by u.nickName
+        LIMIT #{start},#{pageSize}
+    </select>
+
+    <select id="selectCountUserByParam" parameterType="map"
+            resultType="int">
+        SELECT COUNT(*) FROM user
+        WHERE
+        1=1
+        <if test="nickName != null ">
+            and nickName LIKE CONCAT('%',#{nickName},'%' )
+        </if>
+
+
+    </select>
+
+    <delete id="deleteUserRoleByUserId" parameterType="string" >
+    DELETE FROM user_role where userId= #{userId}
+</delete>
+    <delete id="deleteUserById" parameterType="string" >
+ DELETE FROM user where id= #{id}
+    </delete>
+</mapper>

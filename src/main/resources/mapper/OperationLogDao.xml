@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.code.resumemanagement.dao.OperationLogDao">
+
+    <insert id="insertOperationLog" parameterType="com.code.resumemanagement.domain.OperationLog">
+INSERT INTO operationLog (id,operationType,userName,personnelName,personnelId,workType,createName,createDate)
+VALUES(#{id},#{operationType},#{userName},#{personnelName},#{personnelId},#{workType},#{createName},#{createDate});
+    </insert>
+
+    <insert id="batchInsertOperationLog" parameterType="java.util.List">
+        INSERT INTO operationLog (id,operationType,userName,createDate)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.operationType},#{item.userName},#{item.createDate}  </foreach>
+    </insert>
+
+    <select id="selectTodayData" resultType="com.code.resumemanagement.domain.OperationLog" parameterType="string">
+        SELECT *
+        FROM operationLog
+     WHERE   to_days(createDate) = to_days(now())
+    </select>
+    <select id="selectCountOperationByParam" parameterType="map"
+            resultType="int">
+        SELECT COUNT(*) FROM operationLog
+        WHERE
+        1=1
+        <if test="personnelName != null ">
+            and personnelName LIKE CONCAT('%',#{personnelName},'%' )
+        </if>
+        <if test="operationType != null ">
+            and operationType=#{operationType}
+        </if>
+
+
+    </select>
+
+    <select id="selectoperationLogByParam" parameterType="map"
+            resultType="com.code.resumemanagement.domain.OperationLog">
+        SELECT * FROM operationLog
+        WHERE
+        1=1
+        <if test="personnelName != null ">
+            and personnelName LIKE CONCAT('%',#{personnelName},'%' )
+        </if>
+        <if test="operationType != null ">
+            and operationType=#{operationType}
+        </if>
+
+        ORDER  by createDate desc
+        LIMIT #{start},#{pageSize}
+    </select>
+    <select id="selectById" resultType="com.code.resumemanagement.domain.OperationLog">
+        SELECT  * from operationlog WHERE  id=#{id}
+
+    </select>
+
+</mapper>
